@@ -1,0 +1,37 @@
+{
+  "name": "RxMidi",
+  "version": "0.1.0",
+  "summary": "Rx extensions for working with midi interfaces.",
+  "description": "RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.",
+  "homepage": "https://github.com/lintmachine/RxMidi",
+  "license": "MIT",
+  "authors": {
+    "cdann": "cdann@lintmachine.com"
+  },
+  "source": {
+    "git": "https://github.com/lintmachine/RxMidi.git",
+    "tag": "0.1.0"
+  },
+  "social_media_url": "https://twitter.com/lintmachine",
+  "platforms": {
+    "ios": "8.0"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/**/*",
+  "resource_bundles": {
+    "RxMidi": [
+      "Pod/Assets/*.png"
+    ]
+  },
+  "dependencies": {
+    "RxSwift": [
+      "2.0.0-alpha.3"
+    ],
+    "RxCocoa": [
+      "2.0.0-alpha.3"
+    ],
+    "MIKMIDI": [
+      "~> 1.0"
+    ]
+  }
+}

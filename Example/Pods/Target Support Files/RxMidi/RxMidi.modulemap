@@ -1,0 +1,6 @@
+framework module RxMidi {
+  umbrella header "RxMidi-umbrella.h"
+
+  export *
+  module * { export * }
+}

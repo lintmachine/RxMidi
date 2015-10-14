@@ -1,0 +1,2 @@
+MIKMIDI_HEADER_SEARCH_PATHS = "$(SDK_DIR)"/usr/include/libxml2
+MIKMIDI_OTHER_LDFLAGS = -l"xml2" -framework "CoreMIDI"

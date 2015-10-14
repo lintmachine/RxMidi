@@ -1,0 +1,6 @@
+framework module Pods_RxMidi_Tests {
+  umbrella header "Pods-RxMidi_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}
