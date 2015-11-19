@@ -54,7 +54,7 @@ public class RxMidi {
                 
                 for entity in availableEntities {
                     for source in entity.sources {
-                        sources.append(source as! MIKMIDISourceEndpoint)
+                        sources.append(source)
                     }
                 }
                 
@@ -72,7 +72,7 @@ public class RxMidi {
                 
                 for entity in availableEntities {
                     for destination in entity.destinations {
-                        destinations.append(destination as! MIKMIDIDestinationEndpoint)
+                        destinations.append(destination)
                     }
                 }
                 
@@ -91,15 +91,7 @@ public class RxMidi {
             .map {
                 (notification:NSNotification) -> [MIKMIDIDevice] in
                 
-                var availableDevices:[MIKMIDIDevice]
-                
-                if let devices = MIKMIDIDeviceManager.sharedDeviceManager().availableDevices as? [MIKMIDIDevice] {
-                    availableDevices = devices
-                }
-                else {
-                    availableDevices = [MIKMIDIDevice]()
-                }
-                
+                let availableDevices = MIKMIDIDeviceManager.sharedDeviceManager().availableDevices as [MIKMIDIDevice]
                 return availableDevices
             }
             .map {
@@ -109,7 +101,7 @@ public class RxMidi {
                 
                 for device in availableDevices {
                     for entity in device.entities {
-                        entities.append(entity as! MIKMIDIEntity)
+                        entities.append(entity)
                     }
                 }
                 
@@ -149,17 +141,15 @@ public class RxMidi {
     
     public class func midiCommandsForSourceEndpoint(endpoint:MIKMIDISourceEndpoint) -> Observable<MIKMIDICommand> {
         return create {
-            (observer:ObserverOf<MIKMIDICommand>) -> Disposable in
+            (observer:AnyObserver<MIKMIDICommand>) -> Disposable in
             
             var connectionToken:AnyObject?
             
             do {
                 try connectionToken = MIKMIDIDeviceManager.sharedDeviceManager().connectInput(endpoint) {
-                    (source:MIKMIDISourceEndpoint!, messages:[AnyObject]!) -> Void in
-                    for possibleMessage in messages {
-                        if let message = possibleMessage as? MIKMIDICommand {
-                            observer.on(.Next(message))
-                        }
+                    (source:MIKMIDISourceEndpoint, messages:[MIKMIDICommand]) -> Void in
+                    for message in messages {
+                        observer.on(.Next(message))
                     }
                 }
             }
@@ -169,7 +159,7 @@ public class RxMidi {
             
             return AnonymousDisposable {
                 if let token = connectionToken {
-                    MIKMIDIDeviceManager.sharedDeviceManager().disconnectInput(endpoint, forConnectionToken: token)
+                    MIKMIDIDeviceManager.sharedDeviceManager().disconnectConnectionForToken(token)
                     connectionToken = nil
                 }
             }
@@ -178,7 +168,7 @@ public class RxMidi {
     
     public class func sendMidiCommandsToDestination(commands:[MIKMIDICommand], destination:MIKMIDIDestinationEndpoint) -> Observable<Void> {
         return create {
-            (observer:ObserverOf<Void>) -> Disposable in
+            (observer:AnyObserver<Void>) -> Disposable in
             
             do {
                 try MIKMIDIDeviceManager.sharedDeviceManager().sendCommands(commands, toEndpoint: destination)
