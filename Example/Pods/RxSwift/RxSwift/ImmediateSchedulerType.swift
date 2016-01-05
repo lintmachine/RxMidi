@@ -3,7 +3,7 @@
 //  RxSwift
 //
 //  Created by Krunoslav Zaher on 5/31/15.
-//  Copyright (c) 2015 Krunoslav Zaher. All rights reserved.
+//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
 import Foundation
@@ -30,8 +30,8 @@ extension ImmediateSchedulerType {
     - parameter action: Action to execute recursively. The last parameter passed to the action is used to trigger recursive scheduling of the action, passing in recursive invocation state.
     - returns: The disposable object used to cancel the scheduled action (best effort).
     */
-    public func scheduleRecursive<State>(state: State, action: (state: State, recurse: (State) -> Void) -> Void) -> Disposable {
-        let recursiveScheduler = RecursiveImmediateSchedulerOf(action: action, scheduler: self)
+    public func scheduleRecursive<State>(state: State, action: (state: State, recurse: (State) -> ()) -> ()) -> Disposable {
+        let recursiveScheduler = RecursiveImmediateScheduler(action: action, scheduler: self)
         
         recursiveScheduler.schedule(state)
         

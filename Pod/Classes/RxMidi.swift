@@ -12,9 +12,11 @@ import MIKMIDI
 import RxSwift
 import RxCocoa
 
+public typealias RxMidiFilter = Observable<MIKMIDICommand> -> Observable<MIKMIDICommand>
+
 public class RxMidi {
     
-    public enum MidiChannel: Int {
+    public enum MidiChannel: UInt8 {
         case AllChannels = 0
         case Channel01
         case Channel02
@@ -82,30 +84,30 @@ public class RxMidi {
     
     class func availableMidiEntities() -> Observable<[MIKMIDIEntity]> {
         
-        return sequenceOf(
+        return Observable.of(
             NSNotificationCenter.defaultCenter().rx_notification(MIKMIDIDeviceWasAddedNotification),
             NSNotificationCenter.defaultCenter().rx_notification(MIKMIDIDeviceWasRemovedNotification)
-            )
-            .merge()
-            .startWith(NSNotification(name: MIKMIDIDeviceWasAddedNotification, object: nil))
-            .map {
-                (notification:NSNotification) -> [MIKMIDIDevice] in
-                
-                let availableDevices = MIKMIDIDeviceManager.sharedDeviceManager().availableDevices as [MIKMIDIDevice]
-                return availableDevices
-            }
-            .map {
-                (availableDevices:[MIKMIDIDevice]) in
-                
-                var entities = [MIKMIDIEntity]()
-                
-                for device in availableDevices {
-                    for entity in device.entities {
-                        entities.append(entity)
-                    }
+        )
+        .merge()
+        .startWith(NSNotification(name: MIKMIDIDeviceWasAddedNotification, object: nil))
+        .map {
+            (notification:NSNotification) -> [MIKMIDIDevice] in
+            
+            let availableDevices = MIKMIDIDeviceManager.sharedDeviceManager().availableDevices as [MIKMIDIDevice]
+            return availableDevices
+        }
+        .map {
+            (availableDevices:[MIKMIDIDevice]) in
+            
+            var entities = [MIKMIDIEntity]()
+            
+            for device in availableDevices {
+                for entity in device.entities {
+                    entities.append(entity)
                 }
-                
-                return entities
+            }
+            
+            return entities
         }
     }
     
@@ -113,7 +115,7 @@ public class RxMidi {
         return RxMidi.midiCommandsForSourceEndpoints(
             self.availableMidiSourceEndpoints.map {
                 (sources:[MIKMIDISourceEndpoint]) -> Observable<MIKMIDISourceEndpoint> in
-                return sources.asObservable()
+                return sources.toObservable()
             }
             .switchLatest()
         )
@@ -140,7 +142,7 @@ public class RxMidi {
     }
     
     public class func midiCommandsForSourceEndpoint(endpoint:MIKMIDISourceEndpoint) -> Observable<MIKMIDICommand> {
-        return create {
+        return Observable.create {
             (observer:AnyObserver<MIKMIDICommand>) -> Disposable in
             
             var connectionToken:AnyObject?
@@ -167,7 +169,7 @@ public class RxMidi {
     }
     
     public class func sendMidiCommandsToDestination(commands:[MIKMIDICommand], destination:MIKMIDIDestinationEndpoint) -> Observable<Void> {
-        return create {
+        return Observable.create {
             (observer:AnyObserver<Void>) -> Disposable in
             
             do {
@@ -181,5 +183,99 @@ public class RxMidi {
             
             return NopDisposable.instance
         }
+    }
+    
+    // MARK: - Message Stream Functions
+    public class func filterControlChangeCommands(forControllerNumber controllerNumber:UInt) -> RxMidiFilter {
+        return {
+            (commands:Observable<MIKMIDICommand>) in
+            
+            return commands.filter {
+                (command:MIKMIDICommand) -> Bool in
+                
+                if let controlCommand = command as? MIKMIDIControlChangeCommand {
+                    return controlCommand.controllerNumber == controllerNumber
+                }
+                
+                return false
+            }
+        }
+    }
+    
+    public class func filterChannelVoiceCommands(forChannel channel:Observable<UInt8>) -> RxMidiFilter {
+        return {
+            (commands:Observable<MIKMIDICommand>) in
+            
+            return Observable.combineLatest(
+                channel.distinctUntilChanged(),
+                commands
+            ) {
+                (channel, command) -> (UInt8, MIKMIDICommand) in
+                return (channel, command)
+            }
+            .filter {
+                (channel: UInt8, command: MIKMIDICommand) -> Bool in
+                
+                if let voiceCommand = command as? MIKMIDIChannelVoiceCommand {
+                    return voiceCommand.channel == channel
+                }
+                
+                return false
+            }
+            .map {
+                (channel:UInt8, command:MIKMIDICommand) -> MIKMIDICommand in
+                return command
+            }
+        }
+    }
+    
+    public class func monophonicVoiceMap(sourceChannel:Observable<UInt8>, destChannel:Observable<UInt8>) -> RxMidiFilter {
+        return {
+            voiceCommands in
+            
+            var noteOnCommand:MIKMIDINoteOnCommand? = nil
+            
+            return Observable.combineLatest(
+                sourceChannel.distinctUntilChanged(),
+                destChannel.distinctUntilChanged(),
+                voiceCommands
+                ) {
+                    (sourceChannel:UInt8, destChannel:UInt8, voiceCommand:MIKMIDICommand) -> MIKMIDICommand in
+                    
+                    if let noteOn = noteOnCommand {
+                        
+                        // If our voice is currently on an we receive a matching note off command, remap the command to our voice channel and turn the voice off
+                        if let noteOff = voiceCommand as? MIKMIDINoteOffCommand {
+                            if noteOn.channel == noteOff.channel && noteOn.note == noteOff.note {
+                                noteOnCommand = nil
+                                return MIKMIDINoteOffCommand(note: noteOff.note, velocity: noteOff.velocity, channel: destChannel, timestamp: noteOff.timestamp)
+                            }
+                        }
+                    }
+                    else if let noteOn = voiceCommand as? MIKMIDINoteOnCommand {
+                        
+                        // If our voice is currently off an we receive a note on command, remap the command to our voice channel and turn the voice on
+                        if noteOn.channel == sourceChannel {
+                            noteOnCommand = noteOn
+                            return MIKMIDINoteOnCommand(note: noteOn.note, velocity: noteOn.velocity, channel: destChannel, timestamp: noteOn.timestamp)
+                        }
+                    }
+                    
+                    return voiceCommand
+            }
+        }
+    }
+}
+
+infix operator >>> { associativity left }
+
+public func >>> (filter1: RxMidiFilter, filter2: RxMidiFilter) -> RxMidiFilter {
+    return rx_composeFilters(filter1, filter2:filter2)
+}
+
+public func rx_composeFilters(filter1: RxMidiFilter, filter2: RxMidiFilter) -> RxMidiFilter {
+    return {
+        message in
+        filter2(filter1(message))
     }
 }
