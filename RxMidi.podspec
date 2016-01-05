@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "RxMidi"
-  s.version          = "0.1.0"
+  s.version          = "0.1.1"
   s.summary          = "Rx extensions for working with midi interfaces."
   s.description      = <<-DESC
 RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
@@ -29,7 +29,7 @@ RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
   }
 
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'RxSwift', '2.0.0-alpha.3'
-  s.dependency 'RxCocoa', '2.0.0-alpha.3'
-  s.dependency 'MIKMIDI', '~> 1.0'
+  s.dependency 'RxSwift', '~> 2.0'
+  s.dependency 'RxCocoa', '~> 2.0'
+  s.dependency 'MIKMIDI', '~> 1.5'
 end

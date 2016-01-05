@@ -1,18 +1,18 @@
 PODS:
-  - MIKMIDI (1.0.1)
-  - Nimble (1.0.0)
-  - Quick (0.3.1)
-  - RxCocoa (2.0.0-alpha.3):
-    - RxSwift (~> 2.0.0-alpha)
-  - RxMidi (0.1.0):
-    - MIKMIDI (~> 1.0)
-    - RxCocoa (= 2.0.0-alpha.3)
-    - RxSwift (= 2.0.0-alpha.3)
-  - RxSwift (2.0.0-alpha.3)
+  - MIKMIDI (1.5.0)
+  - Nimble (3.0.0)
+  - Quick (0.8.0)
+  - RxCocoa (2.0.0):
+    - RxSwift (~> 2.0)
+  - RxMidi (0.1.1):
+    - MIKMIDI (~> 1.5)
+    - RxCocoa (~> 2.0)
+    - RxSwift (~> 2.0)
+  - RxSwift (2.0.0)
 
 DEPENDENCIES:
   - Nimble
-  - Quick (~> 0.3.1)
+  - Quick (~> 0.8)
   - RxMidi (from `../`)
 
 EXTERNAL SOURCES:
@@ -20,11 +20,11 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  MIKMIDI: e2ab829f9f077979c42ea375e79eed994a9034fc
-  Nimble: 8bee528e5fcc403653076545db562d2b5db7bb87
-  Quick: 824572d3d198d51e52cf4aa722cebf7e59952a35
-  RxCocoa: 2a45f35cd0eb6a01e081b3d11849c2fcb0bdb6de
-  RxMidi: 354dc9873477acfa24f05c11b620f9d58284b4e1
-  RxSwift: c66f7956b2e5fb397a62bf4a3ec6072749a816a7
+  MIKMIDI: d3fb1fdf3459eb9a5d3068536fb30e499266dea6
+  Nimble: 4c353d43735b38b545cbb4cb91504588eb5de926
+  Quick: 563d0f6ec5f72e394645adb377708639b7dd38ab
+  RxCocoa: b0ebd70b4f7450bdb3c8987b122f8fd568dc1e2f
+  RxMidi: 9def385c36f41dd7a77a397a792d9d986d5f36fd
+  RxSwift: d83246efa6f16c50c143bec134649d045498f601
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0

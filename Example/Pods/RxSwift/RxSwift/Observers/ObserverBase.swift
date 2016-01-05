@@ -3,42 +3,37 @@
 //  Rx
 //
 //  Created by Krunoslav Zaher on 2/15/15.
-//  Copyright (c) 2015 Krunoslav Zaher. All rights reserved.
+//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
 import Foundation
 
 class ObserverBase<ElementType> : Disposable, ObserverType {
     typealias E = ElementType
-    
-    var lock = SpinLock()
-    var isStopped: Int32 = 0
-    
-    init() {
-    }
-    
+
+    private var _isStopped: AtomicInt = 0
+
     func on(event: Event<E>) {
         switch event {
         case .Next:
-            if isStopped == 0 {
+            if _isStopped == 0 {
                 onCore(event)
             }
-        case .Error: fallthrough
-        case .Completed:
-           
-            if !OSAtomicCompareAndSwap32(0, 1, &isStopped) {
+        case .Error, .Completed:
+
+            if !AtomicCompareAndSwap(0, 1, &_isStopped) {
                 return
             }
-            
-            self.onCore(event)
+
+            onCore(event)
         }
     }
-    
+
     func onCore(event: Event<E>) {
-        return abstractMethod()
+        abstractMethod()
     }
-    
+
     func dispose() {
-        isStopped = 1
+        _isStopped = 1
     }
 }
