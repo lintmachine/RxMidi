@@ -29,7 +29,7 @@ RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
   }
 
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'RxSwift', '~> 2.0'
-  s.dependency 'RxCocoa', '~> 2.0'
+  s.dependency 'RxSwift', '~> 3.4'
+  s.dependency 'RxCocoa', '~> 3.4'
   s.dependency 'MIKMIDI', '~> 1.5'
 end

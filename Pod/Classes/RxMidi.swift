@@ -12,7 +12,7 @@ import MIKMIDI
 import RxSwift
 import RxCocoa
 
-public typealias RxMidiFilter = Observable<MIKMIDICommand> -> Observable<MIKMIDICommand>
+public typealias RxMidiFilter = (Observable<MIKMIDICommand>) -> Observable<MIKMIDICommand>
 
 public class RxMidi {
     
@@ -85,15 +85,15 @@ public class RxMidi {
     class func availableMidiEntities() -> Observable<[MIKMIDIEntity]> {
         
         return Observable.of(
-            NSNotificationCenter.defaultCenter().rx_notification(MIKMIDIDeviceWasAddedNotification),
-            NSNotificationCenter.defaultCenter().rx_notification(MIKMIDIDeviceWasRemovedNotification)
+            NotificationCenter.default.rx.notification(NSNotification.Name.MIKMIDIDeviceWasAdded),
+            NotificationCenter.default.rx.notification(NSNotification.Name.MIKMIDIDeviceWasRemoved)
         )
         .merge()
-        .startWith(NSNotification(name: MIKMIDIDeviceWasAddedNotification, object: nil))
+        .startWith(Notification(name: NSNotification.Name.MIKMIDIDeviceWasAdded, object: nil))
         .map {
-            (notification:NSNotification) -> [MIKMIDIDevice] in
+            (notification:Notification) -> [MIKMIDIDevice] in
             
-            let availableDevices = MIKMIDIDeviceManager.sharedDeviceManager().availableDevices as [MIKMIDIDevice]
+            let availableDevices = MIKMIDIDeviceManager.shared().availableDevices as [MIKMIDIDevice]
             return availableDevices
         }
         .map {
@@ -113,9 +113,9 @@ public class RxMidi {
     
     public func midiCommandsForAllAvailableSources() -> Observable<MIKMIDICommand> {
         return RxMidi.midiCommandsForSourceEndpoints(
-            self.availableMidiSourceEndpoints.map {
+            endpoints: self.availableMidiSourceEndpoints.map {
                 (sources:[MIKMIDISourceEndpoint]) -> Observable<MIKMIDISourceEndpoint> in
-                return sources.toObservable()
+                return Observable.from(sources)
             }
             .switchLatest()
         )
@@ -123,10 +123,10 @@ public class RxMidi {
     
     public class func midiCommandsForSourceEndpoints(endpoints:Observable<MIKMIDISourceEndpoint>) -> Observable<MIKMIDICommand> {
         return endpoints.map {
-                (source:MIKMIDISourceEndpoint) -> Observable<MIKMIDICommand> in
-                return midiCommandsForSourceEndpoint(source)
-            }
-            .merge()
+            (source:MIKMIDISourceEndpoint) -> Observable<MIKMIDICommand> in
+            return midiCommandsForSourceEndpoint(endpoint: source)
+        }
+        .merge()
     }
     
     public class func filterMidiCommands(commands:Observable<MIKMIDICommand>, forControllerNumber controllerNumber:UInt) -> Observable<MIKMIDICommand> {
@@ -148,20 +148,20 @@ public class RxMidi {
             var connectionToken:AnyObject?
             
             do {
-                try connectionToken = MIKMIDIDeviceManager.sharedDeviceManager().connectInput(endpoint) {
+                try connectionToken = MIKMIDIDeviceManager.shared().connectInput(endpoint) {
                     (source:MIKMIDISourceEndpoint, messages:[MIKMIDICommand]) -> Void in
                     for message in messages {
-                        observer.on(.Next(message))
+                        observer.on(.next(message))
                     }
-                }
+                } as AnyObject
             }
             catch _ {
-                observer.on(.Error(NSError(domain: "com.lintmachine.rx_midi", code: -1, userInfo: [NSLocalizedDescriptionKey:"Failed to connect to midi source."])))
+                observer.on(.error(NSError(domain: "com.lintmachine.rx_midi", code: -1, userInfo: [NSLocalizedDescriptionKey:"Failed to connect to midi source."])))
             }
             
-            return AnonymousDisposable {
+            return Disposables.create() {
                 if let token = connectionToken {
-                    MIKMIDIDeviceManager.sharedDeviceManager().disconnectConnectionForToken(token)
+                    MIKMIDIDeviceManager.shared().disconnectConnection(forToken: token)
                     connectionToken = nil
                 }
             }
@@ -173,15 +173,15 @@ public class RxMidi {
             (observer:AnyObserver<Void>) -> Disposable in
             
             do {
-                try MIKMIDIDeviceManager.sharedDeviceManager().sendCommands(commands, toEndpoint: destination)
+                try MIKMIDIDeviceManager.shared().send(commands, to: destination)
             }
             catch _ {
-                observer.on(.Error(NSError(domain: "com.lintmachine.rx_midi", code: -1, userInfo: [NSLocalizedDescriptionKey:"Failed to send commands to midi destination."])))
+                observer.on(.error(NSError(domain: "com.lintmachine.rx_midi", code: -1, userInfo: [NSLocalizedDescriptionKey:"Failed to send commands to midi destination."])))
             }
 
-            observer.on(.Completed)
+            observer.on(.completed)
             
-            return NopDisposable.instance
+            return Disposables.create()
         }
     }
     
@@ -267,13 +267,17 @@ public class RxMidi {
     }
 }
 
-infix operator >>> { associativity left }
+precedencegroup MultiplicationPrecedence {
+    associativity: left
+    higherThan: AdditionPrecedence
+}
+infix operator >>> : MultiplicationPrecedence
 
-public func >>> (filter1: RxMidiFilter, filter2: RxMidiFilter) -> RxMidiFilter {
-    return rx_composeFilters(filter1, filter2:filter2)
+public func >>> (filter1: @escaping RxMidiFilter, filter2: @escaping RxMidiFilter) -> RxMidiFilter {
+    return rx_composeFilters(filter1: filter1, filter2:filter2)
 }
 
-public func rx_composeFilters(filter1: RxMidiFilter, filter2: RxMidiFilter) -> RxMidiFilter {
+public func rx_composeFilters(filter1: @escaping RxMidiFilter, filter2: @escaping RxMidiFilter) -> RxMidiFilter {
     return {
         message in
         filter2(filter1(message))

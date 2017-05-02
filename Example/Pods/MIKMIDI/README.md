@@ -1,15 +1,15 @@
-This README file is meant to give a broad overview of MIKMIDI. More complete documentation for MIKMIDI can be found [here](http://cocoadocs.org/docsets/MIKMIDI). Questions should be directed to [Andrew Madsen](mailto:andrew@mixedinkey.com).
+This README file is meant to give a broad overview of MIKMIDI. More complete documentation for MIKMIDI can be found [here](http://cocoadocs.org/docsets/MIKMIDI). Questions should be directed to [Andrew Madsen](mailto:andrew@openreelsoftware.com).
 
 MIKMIDI
 -------
 
-MIKMIDI is an easy-to-use Objective-C MIDI library created by Andrew Madsen and developed by him and Chris Flesner of [Mixed In Key](http://www.mixedinkey.com/). It's useful for programmers writing Objective-C or Swift OS X or iOS apps that use MIDI. It includes the ability to communicate with external MIDI devices, to read and write MIDI files, to record and play back MIDI, etc. MIKMIDI is used to provide MIDI functionality in the OS X version of our DJ app, [Flow](http://flowdjsoftware.com), as well as in our flagship app [Mixed In Key](http://www.mixedinkey.com/).
+MIKMIDI is an easy-to-use Objective-C MIDI library created by Andrew Madsen and developed by him and Chris Flesner of [Mixed In Key](http://www.mixedinkey.com/). It's useful for programmers writing Objective-C or Swift OS X or iOS apps that use MIDI. It includes the ability to communicate with external MIDI devices, to read and write MIDI files, to record and play back MIDI, etc. MIKMIDI is used to provide MIDI functionality in the OS X versions of our DJ app, [Flow](http://flowdjsoftware.com), our flagship app [Mixed In Key](http://www.mixedinkey.com/), and our composition software, [Odesi](http://odesi.mixedinkey.com).
 
 MIKMIDI can be used in projects targeting Mac OS X 10.7 and later, and iOS 6 and later. The example code in this readme is in Objective-C. However, MIKMIDI can also easily be used from Swift code.
 
 MIKMIDI is released under an MIT license, meaning you're free to use it in both closed and open source projects. However, even in a closed source project, you must include a publicly-accessible copy of MIKMIDI's copyright notice, which you can find in the LICENSE file.
 
-If you have any questions about, or suggestions for MIKMIDI, please [contact the maintainer](mailto:andrew@mixedinkey.com). Contributions are always welcome. Please see our [contribution guidelines](CONTRIBUTING.md) for more information. We'd also always love to hear about any cool projects you're using it in.
+If you have any questions about, or suggestions for MIKMIDI, please [contact the maintainer](mailto:andrew@openreelsoftware.com). Contributions are always welcome. Please see our [contribution guidelines](CONTRIBUTING.md) for more information. We'd also always love to hear about any cool projects you're using it in.
 
 How To Use MIKMIDI
 ------------------
@@ -31,7 +31,7 @@ To understand MIKMIDI, it's helpful to break it down into its major subsystems:
 
 - Device support -- includes support for device discovery, connection/disconnection, and sending/receiving MIDI messages.
 - Commands -- includes a number of Objective-C classes that various represent MIDI message types as received from and sent to MIDI devices and endpoints.
-- Mapping -- support for generating, saving, loading, and mapping files that associate physical MIDI controls with corresponding application features.
+- Mapping -- support for generating, saving, loading, and using files that associate physical MIDI controls with corresponding application features.
 - Files -- support for reading and writing MIDI files.
 - Synthesis -- support for turning MIDI into audio, e.g. playback of MIDI files and incoming MIDI keyboard input.
 - Sequencing -- Recording and playback of MIDI.
@@ -103,7 +103,7 @@ MIDI synthesis is the process by which MIDI events/messages are turned into audi
 
 ```objective-c
 MIKMIDISourceEndpoint *endpoint = midiDevice.entities.firstObject.sources.firstObject;
-MIKMIDISynthesizer *synth = [[MIKMIDIEndpointSynthesizer alloc] initWithMIDISource:midiDevice.endpoint];
+MIKMIDISynthesizer *synth = [[MIKMIDIEndpointSynthesizer alloc] initWithMIDISource:endpoint];
 ```
 
 MIDI Sequencing
