@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDISequencer.h

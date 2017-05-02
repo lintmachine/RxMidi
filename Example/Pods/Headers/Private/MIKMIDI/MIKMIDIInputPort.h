@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIInputPort.h

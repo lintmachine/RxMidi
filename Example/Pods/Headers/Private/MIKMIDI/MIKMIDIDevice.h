@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIDevice.h

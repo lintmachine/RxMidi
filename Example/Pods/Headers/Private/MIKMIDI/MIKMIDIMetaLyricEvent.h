@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIMetaLyricEvent.h
