@@ -3,6 +3,4 @@ framework module MIKMIDI {
 
   export *
   module * { export * }
-
-  private header "MIKMIDIPrivateUtilities.h"
 }

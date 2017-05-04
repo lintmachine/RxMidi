@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDITrack_Protected.h

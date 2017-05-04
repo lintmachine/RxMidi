@@ -180,23 +180,30 @@
 
 + (NSArray *)commandsFromNoteEvent:(MIKMIDINoteEvent *)noteEvent clock:(MIKMIDIClock *)clock
 {
+	if (!clock) {
+		clock = [MIKMIDIClock clock];
+		[clock syncMusicTimeStamp:noteEvent.timeStamp withMIDITimeStamp:MIKMIDIGetCurrentTimeStamp() tempo:120];
+	}
+
 	return @[[self noteOnCommandFromNoteEvent:noteEvent clock:clock], [self noteOffCommandFromNoteEvent:noteEvent clock:clock]];
 }
 
 + (MIKMIDINoteOnCommand *)noteOnCommandFromNoteEvent:(MIKMIDINoteEvent *)noteEvent clock:(MIKMIDIClock *)clock
 {
-	MIKMutableMIDINoteOnCommand *noteOn = [MIKMutableMIDINoteOnCommand commandForCommandType:MIKMIDICommandTypeNoteOn];
-	noteOn.midiTimestamp = [clock midiTimeStampForMusicTimeStamp:noteEvent.timeStamp];
+	MIKMutableMIDINoteOnCommand *noteOn = [[MIKMutableMIDINoteOnCommand alloc] init];
+	MIDITimeStamp timestamp = clock ? [clock midiTimeStampForMusicTimeStamp:noteEvent.timeStamp] : MIKMIDIGetCurrentTimeStamp();
+	noteOn.midiTimestamp = timestamp;
 	noteOn.channel = noteEvent.channel;
 	noteOn.note = noteEvent.note;
 	noteOn.velocity = noteEvent.velocity;
 	return [noteOn copy];
 }
 
- +(MIKMIDINoteOffCommand *)noteOffCommandFromNoteEvent:(MIKMIDINoteEvent *)noteEvent clock:(MIKMIDIClock *)clock
++ (MIKMIDINoteOffCommand *)noteOffCommandFromNoteEvent:(MIKMIDINoteEvent *)noteEvent clock:(MIKMIDIClock *)clock
 {
-	MIKMutableMIDINoteOffCommand *noteOff = [MIKMutableMIDINoteOffCommand commandForCommandType:MIKMIDICommandTypeNoteOff];
-	noteOff.midiTimestamp = [clock midiTimeStampForMusicTimeStamp:noteEvent.endTimeStamp];
+	MIKMutableMIDINoteOffCommand *noteOff = [[MIKMutableMIDINoteOffCommand alloc] init];
+	MIDITimeStamp timestamp = clock ? [clock midiTimeStampForMusicTimeStamp:noteEvent.timeStamp] : MIKMIDIGetCurrentTimeStamp();
+	noteOff.midiTimestamp = timestamp;
 	noteOff.channel = noteEvent.channel;
 	noteOff.note = noteEvent.note;
 	noteOff.velocity = noteEvent.releaseVelocity;

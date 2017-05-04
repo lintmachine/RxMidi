@@ -1,4 +1,14 @@
+#ifdef __OBJC__
 #import <UIKit/UIKit.h>
+#else
+#ifndef FOUNDATION_EXPORT
+#if defined(__cplusplus)
+#define FOUNDATION_EXPORT extern "C"
+#else
+#define FOUNDATION_EXPORT extern
+#endif
+#endif
+#endif
 
 #import "MIKMIDI.h"
 #import "MIKMIDIChannelEvent.h"
@@ -10,9 +20,9 @@
 #import "MIKMIDIClientSourceEndpoint.h"
 #import "MIKMIDIClock.h"
 #import "MIKMIDICommand.h"
-#import "MIKMIDICommand_SubclassMethods.h"
 #import "MIKMIDICommandScheduler.h"
 #import "MIKMIDICommandThrottler.h"
+#import "MIKMIDICommand_SubclassMethods.h"
 #import "MIKMIDICompilerCompatibility.h"
 #import "MIKMIDIConnectionManager.h"
 #import "MIKMIDIControlChangeCommand.h"
@@ -25,8 +35,8 @@
 #import "MIKMIDIEntity.h"
 #import "MIKMIDIErrors.h"
 #import "MIKMIDIEvent.h"
-#import "MIKMIDIEvent_SubclassMethods.h"
 #import "MIKMIDIEventIterator.h"
+#import "MIKMIDIEvent_SubclassMethods.h"
 #import "MIKMIDIInputPort.h"
 #import "MIKMIDIMappableResponder.h"
 #import "MIKMIDIMapping.h"
@@ -70,8 +80,8 @@
 #import "MIKMIDISequencer.h"
 #import "MIKMIDISourceEndpoint.h"
 #import "MIKMIDISynthesizer.h"
-#import "MIKMIDISynthesizer_SubclassMethods.h"
 #import "MIKMIDISynthesizerInstrument.h"
+#import "MIKMIDISynthesizer_SubclassMethods.h"
 #import "MIKMIDISystemExclusiveCommand.h"
 #import "MIKMIDISystemMessageCommand.h"
 #import "MIKMIDITempoEvent.h"

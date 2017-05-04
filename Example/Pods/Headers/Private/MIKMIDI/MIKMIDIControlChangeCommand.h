@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIControlChangeCommand.h

@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIConnectionManager.h

@@ -33,35 +33,32 @@ class ViewController: UIViewController {
         
         let polyphonicMaping = (
 ///            RxMidi.filterChannelVoiceCommands(forChannel:sourceChannel)
-            RxMidi.monophonicVoiceMap(sourceChannel, destChannel:voice0Channel)
-            >>> RxMidi.monophonicVoiceMap(sourceChannel, destChannel:voice1Channel)
-            >>> RxMidi.monophonicVoiceMap(sourceChannel, destChannel:voice2Channel)
+            RxMidi.monophonicVoiceMap(sourceChannel: sourceChannel, destChannel:voice0Channel)
+            >>> RxMidi.monophonicVoiceMap(sourceChannel: sourceChannel, destChannel:voice1Channel)
+            >>> RxMidi.monophonicVoiceMap(sourceChannel: sourceChannel, destChannel:voice2Channel)
         )
 
         polyphonicMaping(RxMidi.sharedInstance.midiCommandsForAllAvailableSources())
-        .subscribeNext {
-            (command:MIKMIDICommand) -> Void in
+        .subscribe(
+            onNext: {
+            (command:MIKMIDICommand) in
             print("Command: \(command)")
-        }
+        })
         .addDisposableTo(self.disposeBag)
 
-        combineLatest(
+        Observable.combineLatest(
             polyphonicMaping(RxMidi.sharedInstance.midiCommandsForAllAvailableSources()),
             RxMidi.sharedInstance.availableMidiDestinationEndpoints
         ) {
-            (command:MIKMIDICommand, destinations:[MIKMIDIDestinationEndpoint]) -> Void in
+            (command:MIKMIDICommand, destinations:[MIKMIDIDestinationEndpoint]) -> Observable<Void> in
             
-            for destination in destinations {
-                RxMidi.sendMidiCommandsToDestination([command], destination: destination)
-                .subscribeCompleted {
-                    () -> Void in
-                }
-                .addDisposableTo(self.disposeBag)
+            return Observable.from(destinations).map {
+                (destination:MIKMIDIDestinationEndpoint) -> Observable<Void> in
+                return RxMidi.sendMidiCommandsToDestination(commands: [command], destination: destination).take(1)
             }
+            .merge()
         }
-        .subscribeCompleted {
-            () -> Void in
-        }
+        .subscribe(onNext: nil, onError: nil, onCompleted: {})
         .addDisposableTo(self.disposeBag)
     }
 }

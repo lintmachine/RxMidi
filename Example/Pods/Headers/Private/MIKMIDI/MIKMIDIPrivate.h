@@ -1,1 +1,0 @@
-../../../MIKMIDI/Source/MIKMIDIPrivate.h
