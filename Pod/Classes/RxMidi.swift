@@ -186,7 +186,7 @@ public class RxMidi {
     }
     
     // MARK: - Message Stream Functions
-    public class func filterControlChangeCommands(forControllerNumber controllerNumber:UInt) -> RxMidiFilter {
+    public class func filterControlChangeCommands(forControllerNumber controllerNumber:UInt = 0) -> RxMidiFilter {
         return {
             (commands:Observable<MIKMIDICommand>) in
             
@@ -194,7 +194,7 @@ public class RxMidi {
                 (command:MIKMIDICommand) -> Bool in
                 
                 if let controlCommand = command as? MIKMIDIControlChangeCommand {
-                    return controlCommand.controllerNumber == controllerNumber
+                    return controllerNumber == 0 || controlCommand.controllerNumber == controllerNumber
                 }
                 
                 return false
@@ -202,6 +202,7 @@ public class RxMidi {
         }
     }
     
+    // This is highly experimental! -cdann
     public class func filterChannelVoiceCommands(forChannel channel:Observable<UInt8>) -> RxMidiFilter {
         return {
             (commands:Observable<MIKMIDICommand>) in
@@ -229,6 +230,7 @@ public class RxMidi {
         }
     }
     
+    // This is highly experimental! -cdann
     public class func monophonicVoiceMap(sourceChannel:Observable<UInt8>, destChannel:Observable<UInt8>) -> RxMidiFilter {
         return {
             voiceCommands in
