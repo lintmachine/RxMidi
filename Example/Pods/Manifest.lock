@@ -1,32 +1,44 @@
 PODS:
-  - MIKMIDI (1.6.1)
-  - Nimble (6.1.0)
+  - MIKMIDI (1.7.0)
+  - Nimble (7.3.1)
   - Quick (0.10.0)
-  - RxCocoa (3.4.1):
-    - RxSwift (~> 3.4)
-  - RxMidi (0.1.1):
-    - MIKMIDI (~> 1.5)
-    - RxCocoa (~> 3.4)
-    - RxSwift (~> 3.4)
-  - RxSwift (3.4.1)
+  - RxAtomic (4.4.0)
+  - RxCocoa (4.4.0):
+    - RxSwift (~> 4.0)
+  - RxMidi (0.4.0):
+    - MIKMIDI (~> 1.7)
+    - RxCocoa (~> 4.4)
+    - RxSwift (~> 4.4)
+  - RxSwift (4.4.0):
+    - RxAtomic (~> 4.4)
 
 DEPENDENCIES:
   - Nimble
   - Quick (~> 0.8)
   - RxMidi (from `../`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - MIKMIDI
+    - Nimble
+    - Quick
+    - RxAtomic
+    - RxCocoa
+    - RxSwift
+
 EXTERNAL SOURCES:
   RxMidi:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  MIKMIDI: ba2dae32a11dc4f1d980699e49ea1e30d013d101
-  Nimble: c53e6903fee94041b90ded74f135820437d8bf59
+  MIKMIDI: a9192db16687fcf1d2c82b98492b999fa8ede7c6
+  Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   Quick: 5d290df1c69d5ee2f0729956dcf0fd9a30447eaa
-  RxCocoa: a8a5f1d061d0043e28f56976829f31ce63e8eb09
-  RxMidi: de14f792540119063d38fb42b185769eff38cd9a
-  RxSwift: 656f8fbeca5bc372121a72d9ebdd3cd3bc0ffade
+  RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
+  RxCocoa: df63ebf7b9a70d6b4eeea407ed5dd4efc8979749
+  RxMidi: 9cace53f84026f436aad0dbc74a41a9b4586d550
+  RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
 
 PODFILE CHECKSUM: 605dfea5b465c6ec872bcef0b1696e8a097df0ba
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.5.3
