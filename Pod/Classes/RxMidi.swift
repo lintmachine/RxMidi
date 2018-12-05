@@ -93,7 +93,7 @@ public class RxMidi {
         .map {
             (notification:Notification) -> [MIKMIDIDevice] in
             
-            let availableDevices = MIKMIDIDeviceManager.shared().availableDevices as [MIKMIDIDevice]
+            let availableDevices = MIKMIDIDeviceManager.shared.availableDevices as [MIKMIDIDevice]
             return availableDevices
         }
         .map {
@@ -129,12 +129,12 @@ public class RxMidi {
         .merge()
     }
     
-    public class func filterMidiCommands(commands:Observable<MIKMIDICommand>, forControllerNumber controllerNumber:UInt) -> Observable<MIKMIDICommand> {
+    public class func filterMidiCommands(commands:Observable<MIKMIDICommand>, forControllerNumber controllerNumber:UInt = 0) -> Observable<MIKMIDICommand> {
         return commands
             .filter {
                 (command:MIKMIDICommand) -> Bool in
                 if let controlCommand = command as? MIKMIDIControlChangeCommand {
-                    return controlCommand.controllerNumber == controllerNumber
+                    return controllerNumber == 0 || controlCommand.controllerNumber == controllerNumber
                 }
                 
                 return false
@@ -148,7 +148,7 @@ public class RxMidi {
             var connectionToken:AnyObject?
             
             do {
-                try connectionToken = MIKMIDIDeviceManager.shared().connectInput(endpoint) {
+                try connectionToken = MIKMIDIDeviceManager.shared.connectInput(endpoint) {
                     (source:MIKMIDISourceEndpoint, messages:[MIKMIDICommand]) -> Void in
                     for message in messages {
                         observer.on(.next(message))
@@ -161,7 +161,7 @@ public class RxMidi {
             
             return Disposables.create() {
                 if let token = connectionToken {
-                    MIKMIDIDeviceManager.shared().disconnectConnection(forToken: token)
+                    MIKMIDIDeviceManager.shared.disconnectConnection(forToken: token)
                     connectionToken = nil
                 }
             }
@@ -173,7 +173,7 @@ public class RxMidi {
             (observer:AnyObserver<Void>) -> Disposable in
             
             do {
-                try MIKMIDIDeviceManager.shared().send(commands, to: destination)
+                try MIKMIDIDeviceManager.shared.send(commands, to: destination)
             }
             catch _ {
                 observer.on(.error(NSError(domain: "com.lintmachine.rx_midi", code: -1, userInfo: [NSLocalizedDescriptionKey:"Failed to send commands to midi destination."])))

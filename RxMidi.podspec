@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "RxMidi"
-  s.version          = "0.2.0"
+  s.version          = "0.4.0"
   s.summary          = "Rx extensions for working with midi interfaces."
   s.description      = <<-DESC
 RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
@@ -20,7 +20,7 @@ RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
   s.source           = { :git => "https://github.com/lintmachine/RxMidi.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/lintmachine'
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '9.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
@@ -28,8 +28,7 @@ RxMidi provides RxSwift based extenstions for the MIKMIDI iOS MIDI library.
     'RxMidi' => ['Pod/Assets/*.png']
   }
 
-  # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'RxSwift', '~> 3.4'
-  s.dependency 'RxCocoa', '~> 3.4'
-  s.dependency 'MIKMIDI', '~> 1.6'
+  s.dependency 'RxSwift', '~> 4.4'
+  s.dependency 'RxCocoa', '~> 4.4'
+  s.dependency 'MIKMIDI', '~> 1.7'
 end

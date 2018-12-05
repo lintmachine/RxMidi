@@ -8,10 +8,3 @@ target 'RxMidi_Example' do
   pod "RxMidi", :path => "../"
 end
 
-target 'RxMidi_Tests' do
-  use_frameworks!
-  pod "RxMidi", :path => "../"
-
-  pod 'Quick', '~> 0.8'
-  pod 'Nimble'
-end

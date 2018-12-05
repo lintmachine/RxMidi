@@ -44,7 +44,7 @@ class ViewController: UIViewController {
             (command:MIKMIDICommand) in
             print("Command: \(command)")
         })
-        .addDisposableTo(self.disposeBag)
+        .disposed(by: self.disposeBag)
 
         Observable.combineLatest(
             polyphonicMaping(RxMidi.sharedInstance.midiCommandsForAllAvailableSources()),
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
             .merge()
         }
         .subscribe(onNext: nil, onError: nil, onCompleted: {})
-        .addDisposableTo(self.disposeBag)
+        .disposed(by: self.disposeBag)
     }
 }
 
